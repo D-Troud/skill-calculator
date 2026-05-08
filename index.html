@@ -37,17 +37,16 @@ th{background:#333;}
 </select>
 
 현재 레벨
-<input id="curLvl" type="number" value="1">
-
+<input id="currentLevel" type="number" min="1" max="100" value="1">
 <br><br>
 
 목표 승천
 <select id="tarAsc">
-<option>0</option><option>1</option><option>2</option><option>3</option>
+<option>0</option><option>1</option><option>2</option><option selected>3</option>
 </select>
 
 목표 레벨
-<input id="tarLvl" type="number" value="10">
+<input id="targetLevel" type="number" min="1" max="100" value="100">
 
 </div>
 
@@ -158,6 +157,14 @@ let tarAsc=Number(tarAscEl.value)
 let curLvl=Number(curLvlEl.value)
 let tarLvl=Number(tarLvlEl.value)
 
+if(
+    curAsc > tarAsc ||
+    (curAsc === tarAsc && curLevel > tarLevel)
+){
+    costResult.innerText="목표 레벨이 현재보다 낮습니다."
+    return
+}
+  
 let total=0
 
 while(true){

@@ -156,14 +156,6 @@ let curAsc=Number(curAscEl.value)
 let tarAsc=Number(tarAscEl.value)
 let curLvl=Number(curLvlEl.value)
 let tarLvl=Number(tarLvlEl.value)
-
-if(
-    curAsc > tarAsc ||
-    (curAsc === tarAsc && curLevel > tarLevel)
-){
-    costResult.innerText="목표 레벨이 현재보다 낮습니다."
-    return
-}
   
 let total=0
 

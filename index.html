@@ -55,6 +55,7 @@ th{background:#333;}
 
 <div class="result" id="summonCount"></div>
 <div class="result" id="ticketResult"></div>
+<div class="result" id="clanScoreResult"></div> <!-- 클랜 전쟁 점수 표시 영역 추가 -->
 
 </div>
 
@@ -163,6 +164,7 @@ if(
 ){
     summonCount.innerText="목표 레벨이 현재보다 낮습니다."
     ticketResult.innerText=""
+    clanScoreResult.innerText="" // 에러 시 클랜 점수도 초기화
     return
 }
   
@@ -188,6 +190,7 @@ curLvl=1
 }
 
 let ticket=total*40*(1-discount)
+let clanScore=total*225 // 클랜 전쟁 점수 계산 (필요 소환 횟수 * 225)
 
 summonCount.innerText="필요 소환 횟수 : "+total.toLocaleString()
 let ticketCeil=Math.ceil(ticket)
@@ -197,6 +200,10 @@ let ticketK=(ticketCeil/1000).toFixed(1).replace(/\.0$/,"")
 
 ticketResult.innerText=
 "필요 스킬 티켓 : "+ticketCeil.toLocaleString()+" ("+ticketK+"k)"
+
+// 클랜 전쟁 점수 결과 출력
+clanScoreResult.innerText=
+"클랜 전쟁 점수(클랜 기술 풀업 기준) : "+clanScore.toLocaleString()
 }
 
 // 🔥 표 생성
@@ -230,6 +237,7 @@ const tarLvlEl=document.getElementById("tarLvl")
 
 const summonCount=document.getElementById("summonCount")
 const ticketResult=document.getElementById("ticketResult")
+const clanScoreResult=document.getElementById("clanScoreResult") // 클랜 점수 DOM 요소 연결
 
 document.querySelectorAll("input,select").forEach(el=>{
 el.oninput=calculate

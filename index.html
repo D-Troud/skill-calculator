@@ -21,7 +21,7 @@ th{background:#333;}
 <body>
 
 <h1>포지마스터 스킬 계산기</h1>
-<p>제작자 : 21서버 Dominant 클랜 리더 Troud</p>
+<p>제작자 : 21서버 Dominant 클랜 리더 Troud (3승천 150레벨 확장 반영)</p>
 
 <div class="card">
 <h2>기술 트리 티어 설정</h2>
@@ -37,7 +37,7 @@ th{background:#333;}
 </select>
 
 현재 레벨
-<input id="curLvl" type="number" min="1" max="100" value="1">
+<input id="curLvl" type="number" min="1" max="150" value="1">
 <br><br>
 
 목표 승천
@@ -46,7 +46,7 @@ th{background:#333;}
 </select>
 
 목표 레벨
-<input id="tarLvl" type="number" min="1" max="100" value="100">
+<input id="tarLvl" type="number" min="1" max="150" value="150">
 
 </div>
 
@@ -55,12 +55,12 @@ th{background:#333;}
 
 <div class="result" id="summonCount"></div>
 <div class="result" id="ticketResult"></div>
-<div class="result" id="clanScoreResult"></div> <!-- 클랜 전쟁 점수 표시 영역 추가 -->
+<div class="result" id="clanScoreResult"></div>
 
 </div>
 
 <div class="card">
-<h2>레벨별 필요 소환 횟수</h2>
+<h2>레벨별 필요 소환 횟수 (1~150)</h2>
 
 <table id="summonTable">
 <tr>
@@ -72,6 +72,11 @@ th{background:#333;}
 </div>
 
 <script>
+
+// 🔥 승천별 최대 레벨 반환 함수 (0~2승천: 100레벨, 3승천: 150레벨)
+function getMaxLevel(asc){
+return asc === 3 ? 150 : 100;
+}
 
 // 🔥 소환 횟수 함수
 function getSummonCount(lvl){
@@ -92,16 +97,19 @@ if(lvl===14) return 80
 if(lvl===15) return 90
 if(lvl===16) return 100
 
+// 17~100 구간
+if(lvl <= 100) return 110
 
-return 110
+// 101~150 구간 (100레벨 이후부터 레벨당 75씩 증가)
+return 110 + (lvl - 100) * 75;
 }
 
-// 티어 UI
+// 티어 UI (T1 ~ T6)
 function createUI(){
 
 let html="<b>스킬 소환 비용 감소</b><br>"
 
-for(let i=1;i<=5;i++){
+for(let i=1;i<=6;i++){
 html+="T"+i+" <select id='tier"+i+"' onchange='handleTier("+i+")'>"
 for(let j=0;j<=5;j++){
 html+="<option>"+j+"</option>"
@@ -114,13 +122,13 @@ html+="<div class='stat' id='tierStat'></div>"
 document.getElementById("tiers").innerHTML=html
 }
 
-// 티어 로직
+// 티어 로직 (T1 ~ T6 연동)
 function handleTier(t){
 
 let val=Number(document.getElementById("tier"+t).value)
 
 if(val===0){
-for(let i=t+1;i<=5;i++){
+for(let i=t+1;i<=6;i++){
 document.getElementById("tier"+i).value=0
 }
 }
@@ -138,7 +146,7 @@ calculate()
 function getDiscount(){
 
 let sum=0
-for(let i=1;i<=5;i++){
+for(let i=1;i<=6;i++){
 sum+=Number(document.getElementById("tier"+i).value)
 }
 
@@ -158,13 +166,20 @@ let tarAsc=Number(tarAscEl.value)
 let curLvl=Number(curLvlEl.value)
 let tarLvl=Number(tarLvlEl.value)
 
+// 입력값 검증: 목표 레벨이 해당 승천의 최대 레벨을 넘지 않도록 제한
+let maxCurLvl = getMaxLevel(curAsc);
+let maxTarLvl = getMaxLevel(tarAsc);
+
+if(curLvl > maxCurLvl) curLvl = maxCurLvl;
+if(tarLvl > maxTarLvl) tarLvl = maxTarLvl;
+
 if(
     curAsc > tarAsc ||
     (curAsc === tarAsc && curLvl > tarLvl)
 ){
     summonCount.innerText="목표 레벨이 현재보다 낮습니다."
     ticketResult.innerText=""
-    clanScoreResult.innerText="" // 에러 시 클랜 점수도 초기화
+    clanScoreResult.innerText=""
     return
 }
   
@@ -173,15 +188,14 @@ let total=0
 while(true){
 
 if(curAsc===tarAsc){
-
 for(let i=curLvl+1;i<=tarLvl;i++){
 total+=getSummonCount(i)
 }
-
 break
 }
 
-for(let i=curLvl+1;i<=100;i++){
+let maxLvl = getMaxLevel(curAsc);
+for(let i=curLvl+1;i<=maxLvl;i++){
 total+=getSummonCount(i)
 }
 
@@ -206,12 +220,12 @@ clanScoreResult.innerText=
 "클랜 전쟁 소환 점수(클랜 기술 풀업 기준) : "+clanScore.toLocaleString()
 }
 
-// 🔥 표 생성
+// 🔥 표 생성 (1~150레벨)
 function createTable(){
 
 let html=""
 
-for(let i=1;i<=100;i++){
+for(let i=1;i<=150;i++){
 
 html+="<tr>"
 html+="<td>"+i+"</td>"
@@ -237,7 +251,7 @@ const tarLvlEl=document.getElementById("tarLvl")
 
 const summonCount=document.getElementById("summonCount")
 const ticketResult=document.getElementById("ticketResult")
-const clanScoreResult=document.getElementById("clanScoreResult") // 클랜 점수 DOM 요소 연결
+const clanScoreResult=document.getElementById("clanScoreResult")
 
 document.querySelectorAll("input,select").forEach(el=>{
 el.oninput=calculate
